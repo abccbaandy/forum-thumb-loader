@@ -1,0 +1,12 @@
+{
+"name":"soul plus thumb loader",
+"description":"從列表自動抓取預覽圖",
+"version":"1",
+"manifest_version":2,
+"content_scripts": [
+    {
+      "matches": ["http://bbs.soul-plus.net/thread.php?*"],
+      "js": ["imageLoader.js"]
+    }
+  ]
+}
