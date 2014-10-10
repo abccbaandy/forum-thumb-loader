@@ -1,12 +1,16 @@
 {
-"name":"soul plus thumb loader",
-"description":"從列表自動抓取預覽圖",
-"version":"1",
-"manifest_version":2,
-"content_scripts": [
-    {
-      "matches": ["http://bbs.soul-plus.net/thread.php?*"],
-      "js": ["imageLoader.js"]
-    }
-  ]
+	"name":"soul plus thumb loader",
+	"description":"從列表自動抓取預覽圖",
+	"version":"1",
+	"manifest_version":2,
+	"background": {
+        "persistent": false,
+        "scripts": [ "worker_proxy.js" ]
+    },
+	"content_scripts": 
+	[{
+		"matches": ["http://bbs.soul-plus.net/thread.php?*"],
+		"js": ["worker_proxy.js", "content.js"]
+	}],
+	"web_accessible_resources": ["worker_proxy.html"]
 }
