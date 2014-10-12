@@ -7,10 +7,12 @@
         "persistent": false,
         "scripts": [ "worker_proxy.js" ]
     },
+    "options_page": "index.html",
 	"content_scripts": 
 	[{
 		"matches": ["http://bbs.soul-plus.net/thread.php?*"],
 		"js": ["worker_proxy.js", "content.js"]
 	}],
-	"web_accessible_resources": ["worker_proxy.html"]
+	"web_accessible_resources": ["worker_proxy.html"],
+	"permissions": ["storage"]
 }
