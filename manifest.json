@@ -5,14 +5,14 @@
 	"manifest_version":2,
 	"background": {
         "persistent": false,
-        "scripts": [ "worker_proxy.js" ]
+        "scripts": [ "worker_proxy.js", "db.js", "eventPage.js" ]
     },
     "options_page": "index.html",
 	"content_scripts": 
 	[{
 		"matches": ["http://bbs.soul-plus.net/thread.php?*"],
-		"js": ["worker_proxy.js", "content.js"]
+		"js": ["db.js", "worker_proxy.js", "content.js"]
 	}],
 	"web_accessible_resources": ["worker_proxy.html"],
-	"permissions": ["storage"]
+	"permissions": ["unlimitedStorage", "storage"]
 }

@@ -45,7 +45,7 @@ function refreshTodos() {
   todoDB.fetchTodos(function(todos) {
     var todoList = document.getElementById('todo-items');
     todoList.innerHTML = '<tr><th>XXXX</th><th>imageSpaces</th><th>postUrls</th><th>skipUrls</th></tr>';
-    
+    console.log("fetchTodos todos.length: " + todos.length);
     for(var i = 0; i < todos.length; i++) {
       // Read the todo items backwards (most recent first).
       var todo = todos[(todos.length - 1 - i)];
