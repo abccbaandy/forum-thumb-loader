@@ -90,7 +90,7 @@ var todoDB = (function() {
    * Create a new todo item.
    * @param {string} text The todo item.
    */
-  tDB.createTodo = function(imageSpaces_text, postUrls_text, skipUrls_text, callback) {
+  tDB.createTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, callback) {
     // Get a reference to the db.
     var db = datastore;
 
@@ -105,6 +105,7 @@ var todoDB = (function() {
     
     // Create an object for the todo item.
     var todo = {
+      'matchUrl': matchUrl_text,
       'imageSpaces': imageSpaces_text,
       'postUrls': postUrls_text,
       'skipUrls': skipUrls_text,

@@ -6,7 +6,7 @@ var skipUrls = document.querySelectorAll(".tr3.t_one td img[title='置顶帖标�
 var imageSpaces;
 var postUrls;
 var skipUrls;
-
+var tabUrl;
 
 function showImg(img, imageSpacesIndex) {
     var tempImg = document.createElement('img');
@@ -82,8 +82,25 @@ function refreshTodos(todos) {
     }
 }
 
-chrome.runtime.sendMessage({method: "getData"}, function(response) {
+chrome.runtime.sendMessage({method: "getTabUrl"}, function(response) {
     //console.log("response : "+response.data);
-    console.log("response : "+response.data.length);
-    refreshTodos(response.data);
+    console.log("response tab.url: "+response.url);
+    tabUrl = response.url;
+    chrome.runtime.sendMessage({method: "getData"}, function(response) {
+        //console.log("response : "+response.data);
+        console.log("response DB length: "+response.data.length);
+        var data = response.data;
+        for (var i = 0; i < data.length; i++) {
+            var patt = new RegExp(data[i].matchUrl);
+            console.log("data[i].matchUrl : "+data[i].matchUrl);
+            console.log("data[i].matchUrl test: "+ patt.test(tabUrl));
+            if(patt.test(tabUrl)) {
+                refreshTodos(response.data);
+            }
+        };
+        
+    });
 });
+
+
+

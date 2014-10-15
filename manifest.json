@@ -1,6 +1,6 @@
 {
-	"name":"soul plus thumb loader",
-	"description":"從列表自動抓取預覽圖",
+	"name":"forum thumb loader",
+	"description":"從文章列表自動抓取預覽圖",
 	"version":"1",
 	"manifest_version":2,
 	"background": {
@@ -10,9 +10,9 @@
     "options_page": "index.html",
 	"content_scripts": 
 	[{
-		"matches": ["http://bbs.soul-plus.net/thread.php?*"],
+		"matches": ["<all_urls>"],
 		"js": ["db.js", "worker_proxy.js", "content.js"]
 	}],
 	"web_accessible_resources": ["worker_proxy.html"],
-	"permissions": ["unlimitedStorage", "storage"]
+	"permissions": ["unlimitedStorage", "storage", "tabs"]
 }
