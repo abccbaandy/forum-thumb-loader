@@ -46,24 +46,35 @@ window.onload = function() {
 function refreshTodos() {
   todoDB.fetchTodos(function(todos) {
     var todoList = document.getElementById('todo-items');
-    todoList.innerHTML = '<tr><th>XXXX</th><th>matchUrl</th><th>imageSpaces</th><th>postUrls</th><th>skipUrls</th></tr>';
+    todoList.innerHTML = '<tr><th>Edit</th><th>Delete</th><th>matchUrl</th><th>imageSpaces</th><th>postUrls</th><th>skipUrls(Optional)</th></tr>';
     console.log("fetchTodos todos.length: " + todos.length);
     for (var i = 0; i < todos.length; i++) {
       // Read the todo items backwards (most recent first).
       var todo = todos[(todos.length - 1 - i)];
 
       var tr = document.createElement('tr');
+      var td0 = document.createElement('td');
       var td1 = document.createElement('td');
       var td2 = document.createElement('td');
       var td3 = document.createElement('td');
       var td4 = document.createElement('td');
       var td5 = document.createElement('td');
-      var checkbox = document.createElement('input');
-      checkbox.type = "checkbox";
-      checkbox.className = "todo-checkbox";
-      checkbox.setAttribute("data-id", todo.timestamp);
 
-      td1.appendChild(checkbox);
+      var editBtn = document.createElement('input');
+      editBtn.type = "button";
+      editBtn.className = "editBtn";
+      editBtn.value = "edit";
+      editBtn.setAttribute("data-id", todo.timestamp);
+
+      td0.appendChild(editBtn);
+
+      var delBtn = document.createElement('input');
+      delBtn.type = "button";
+      delBtn.className = "todo-checkbox";
+      delBtn.value = "delete";
+      delBtn.setAttribute("data-id", todo.timestamp);
+
+      td1.appendChild(delBtn);
 
       //var span = document.createElement('span');
       //span.innerHTML = todo.text;
@@ -71,10 +82,15 @@ function refreshTodos() {
       //td2.appendChild(span);
 
       td2.innerHTML = todo.matchUrl;
+      td2.setAttribute('contenteditable', 'true');
       td3.innerHTML = todo.imageSpaces;
+      td3.setAttribute('contenteditable', 'true');
       td4.innerHTML = todo.postUrls;
+      td4.setAttribute('contenteditable', 'true');
       td5.innerHTML = todo.skipUrls;
+      td5.setAttribute('contenteditable', 'true');
 
+      tr.appendChild(td0);
       tr.appendChild(td1);
       tr.appendChild(td2);
       tr.appendChild(td3);
@@ -82,8 +98,26 @@ function refreshTodos() {
       tr.appendChild(td5);
       todoList.appendChild(tr);
 
-      // Setup an event listener for the checkbox.
-      checkbox.addEventListener('click', function(e) {
+      editBtn.addEventListener('click', function(e) {
+        var id = parseInt(e.target.getAttribute('data-id'));
+        var matchUrl_text;
+        var imageSpaces_text;
+        var postUrls_text;
+        var skipUrls_text;
+        var table = document.getElementById('todo-items');
+        for (var i = 1; i < table.rows.length; i++) {
+          if (table.rows[i].cells[0].childNodes[0].getAttribute('data-id') == id) {
+            var row = table.rows[i];
+            matchUrl_text = row.cells[2].innerHTML;
+            imageSpaces_text = row.cells[3].innerHTML;
+            postUrls_text = row.cells[4].innerHTML;
+            skipUrls_text = row.cells[5].innerHTML;
+          }
+        }
+        todoDB.updateTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, id, refreshTodos);
+      });
+
+      delBtn.addEventListener('click', function(e) {
         var id = parseInt(e.target.getAttribute('data-id'));
 
         todoDB.deleteTodo(id, refreshTodos);

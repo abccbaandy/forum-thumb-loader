@@ -148,7 +148,37 @@ var todoDB = (function() {
     }
   };
 
+  tDB.updateTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, id, callback) {
+    var db = datastore;
+    var transaction = db.transaction(['todo'], 'readwrite');
+    var objStore = transaction.objectStore('todo');
 
+    var request = objStore.get(id);
+
+    // Handle a successful datastore put.
+    request.onsuccess = function(e) {
+      var data = request.result;
+      data.matchUrl = matchUrl_text;
+      data.imageSpaces = imageSpaces_text;
+      data.postUrls = postUrls_text;
+      data.skipUrls = skipUrls_text;
+      var requestUpdate = objStore.put(data);
+      requestUpdate.onerror = function(event) {
+        // Do something with the error
+      };
+      requestUpdate.onsuccess = function(event) {
+        // Success - the data is updated!
+        alert("update successful");
+        // Execute the callback function.
+        callback();
+      };
+
+
+    };
+
+    // Handle errors.
+    request.onerror = tDB.onerror;
+  };
   // Export the tDB object.
   return tDB;
 }());
