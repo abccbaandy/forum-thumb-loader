@@ -6,19 +6,19 @@
 
 
 window.onload = function() {
-  
+
   // Display the todo items.
   todoDB.open(refreshTodos);
-  
-  
+
+
   // Get references to the form elements.
   var newTodoForm = document.getElementById('new-todo-form');
   var matchUrl = document.getElementById('matchUrl');
   var imageSpaces = document.getElementById('imageSpaces');
   var postUrls = document.getElementById('postUrls');
   var skipUrls = document.getElementById('skipUrls');
-  
-  
+
+
   // Handle new todo item form submissions.
   newTodoForm.onsubmit = function() {
     // Get the todo text.
@@ -26,29 +26,29 @@ window.onload = function() {
     var imageSpaces_text = imageSpaces.value;
     var postUrls_text = postUrls.value;
     var skipUrls_text = skipUrls.value;
-    
 
-      // Create the todo item.
-      todoDB.createTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, function(todo) {
-        refreshTodos();
-      });
-    
+
+    // Create the todo item.
+    todoDB.createTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, function(todo) {
+      refreshTodos();
+    });
+
     // Reset the input field.
     newTodoInput.value = '';
-    
+
     // Don't send the form.
     return false;
   };
-  
+
 }
 
 // Update the list of todo items.
-function refreshTodos() {  
+function refreshTodos() {
   todoDB.fetchTodos(function(todos) {
     var todoList = document.getElementById('todo-items');
     todoList.innerHTML = '<tr><th>XXXX</th><th>matchUrl</th><th>imageSpaces</th><th>postUrls</th><th>skipUrls</th></tr>';
     console.log("fetchTodos todos.length: " + todos.length);
-    for(var i = 0; i < todos.length; i++) {
+    for (var i = 0; i < todos.length; i++) {
       // Read the todo items backwards (most recent first).
       var todo = todos[(todos.length - 1 - i)];
 
@@ -62,26 +62,26 @@ function refreshTodos() {
       checkbox.type = "checkbox";
       checkbox.className = "todo-checkbox";
       checkbox.setAttribute("data-id", todo.timestamp);
-      
+
       td1.appendChild(checkbox);
-      
+
       //var span = document.createElement('span');
       //span.innerHTML = todo.text;
-      
+
       //td2.appendChild(span);
 
       td2.innerHTML = todo.matchUrl;
       td3.innerHTML = todo.imageSpaces;
       td4.innerHTML = todo.postUrls;
       td5.innerHTML = todo.skipUrls;
-      
+
       tr.appendChild(td1);
       tr.appendChild(td2);
       tr.appendChild(td3);
       tr.appendChild(td4);
       tr.appendChild(td5);
       todoList.appendChild(tr);
-      
+
       // Setup an event listener for the checkbox.
       checkbox.addEventListener('click', function(e) {
         var id = parseInt(e.target.getAttribute('data-id'));
@@ -92,6 +92,3 @@ function refreshTodos() {
 
   });
 }
-
-
-

@@ -1,14 +1,25 @@
-/*
-var imageSpaces = document.querySelectorAll(".tr3.t_one td a[title='打开新窗口']");
-var postUrls = document.querySelectorAll(".tr3.t_one td h3 a");
-var skipUrls = document.querySelectorAll(".tr3.t_one td img[title='置顶帖标志']");
-*/
+//thread
+// http:\/\/bbs\.soul-plus\.net\/thread\.php\?.*
+// var imageSpaces = document.querySelectorAll(".tr3.t_one td a[title='打开新窗口']");
+// var postUrls = document.querySelectorAll(".tr3.t_one td h3 a");
+// var skipUrls = document.querySelectorAll(".tr3.t_one td img[title='置顶帖标志']");
+// postImgUrl = #read_tpc.f14 img
+
+
+//search
+// http:\/\/bbs\.soul-plus\.net\/search\.php\?.*
+// var imageSpaces = document.querySelectorAll("tr.tr3.tac th.y-style");
+// var postUrls = document.querySelectorAll("tr.tr3.tac th.y-style a");
+// var skipUrls = document.querySelectorAll("");
+// postImgUrl = #read_tpc.f14 img
+
 var imageSpaces;
 var postUrls;
 var skipUrls;
-var tabUrl;
+var thisTabUrl;
+var postImgUrl;
 
-function showImg(img, imageSpacesIndex) {
+function showThumbnail(img, imageSpacesIndex) {
     var tempImg = document.createElement('img');
     tempImg.src = img.src;
     tempImg.width = 200;
@@ -16,91 +27,87 @@ function showImg(img, imageSpacesIndex) {
     imageSpaces[imageSpacesIndex].appendChild(tempImg);
 }
 
-function loadImg(imgsUrls, loadImgCount, imageSpacesIndex) {
+function loadPostImg(imgsUrls, loadImgCount, imageSpacesIndex) {
     var img = new Image();
     img.src = imgsUrls[loadImgCount].src;
-    img.onload = function () {
+    img.onload = function() {
 
         //we only care the first valid image:)
         if (img.naturalWidth > 100 && img.naturalHeight > 100) {
-            showImg(img, imageSpacesIndex);
-            //postMessage(img.src);
-        }
-        else {
+            showThumbnail(img, imageSpacesIndex);
+        } else {
             loadImgCount++;
             if (loadImgCount < imgsUrls.length) {
-                loadImg(imgsUrls, loadImgCount, imageSpacesIndex);
+                loadPostImg(imgsUrls, loadImgCount, imageSpacesIndex);
             }
         }
     }
 }
 
-function getImg(responseText, imageSpacesIndex) {
+function getPostImg(responseText, imageSpacesIndex) {
     var result = new DOMParser().parseFromString(responseText, "text/html");
 
     var imgsUrls = result.querySelectorAll("#read_tpc.f14 img");
+    // console.log("getPostImg imgsUrls length : " + imgsUrls.length);
 
     //check there is at least one image
     if (imgsUrls.length != 0) {
-        var loadImgCount = 0;
-        loadImg(imgsUrls, loadImgCount, imageSpacesIndex);
-    }
-}
-/*
-for (var i = skipUrls.length; i < postUrls.length; i++) { 
-//for (var i = skipUrls.length; i < skipUrls.length+5; i++) { 
-    //httpGet(postUrls[i].href, i);
-    var worker = new Worker(chrome.runtime.getURL('imageLoader.js'));
-    worker.onmessage = function(event) {
-        var args = event.data.args;
-        getImg(args[0], args[1]);
-    };
-    worker.postMessage({"args":[postUrls[i].href, i]});
-}
-*/
-
-function refreshTodos(todos) {
-    console.log("refreshTodos todos.length: " + todos.length);
-    for (var i = 0; i < todos.length; i++) {
-        // Read the todo items backwards (most recent first).
-        var todo = todos[(todos.length - 1 - i)];
-
-        imageSpaces = document.querySelectorAll(todo.imageSpaces);
-        postUrls = document.querySelectorAll(todo.postUrls);
-        skipUrls = document.querySelectorAll(todo.skipUrls);
-        console.log("for : " + skipUrls);
-        for (var i = skipUrls.length; i < postUrls.length; i++) {
-            //for (var i = skipUrls.length; i < skipUrls.length+5; i++) { 
-            //httpGet(postUrls[i].href, i);
-            var worker = new Worker(chrome.runtime.getURL('imageLoader.js'));
-            worker.onmessage = function (event) {
-                var args = event.data.args;
-                getImg(args[0], args[1]);
-            };
-            worker.postMessage({ "args": [postUrls[i].href, i] });
-        }
+        //load "first image" first
+        loadPostImg(imgsUrls, 0, imageSpacesIndex);
     }
 }
 
-chrome.runtime.sendMessage({method: "getTabUrl"}, function(response) {
-    //console.log("response : "+response.data);
-    console.log("response tab.url: "+response.url);
-    tabUrl = response.url;
-    chrome.runtime.sendMessage({method: "getData"}, function(response) {
-        //console.log("response : "+response.data);
-        console.log("response DB length: "+response.data.length);
-        var data = response.data;
-        for (var i = 0; i < data.length; i++) {
-            var patt = new RegExp(data[i].matchUrl);
-            console.log("data[i].matchUrl : "+data[i].matchUrl);
-            console.log("data[i].matchUrl test: "+ patt.test(tabUrl));
-            if(patt.test(tabUrl)) {
-                refreshTodos(response.data);
-            }
+function getAllMatchPost(postRegex) {
+    imageSpaces = document.querySelectorAll(postRegex.imageSpaces);
+    console.log("getAllMatchPost imageSpaces length : " + imageSpaces.length);
+    postUrls = document.querySelectorAll(postRegex.postUrls);
+    console.log("getAllMatchPost postUrls length : " + postUrls.length);
+    if (postRegex.skipUrls == "") {
+        skipUrls = [];
+    } else {
+        skipUrls = document.querySelectorAll(postRegex.skipUrls);
+    }
+    console.log("getAllMatchPost skipUrls length : " + skipUrls.length);
+    
+    
+    for (var i = skipUrls.length; i < postUrls.length; i++) {
+
+        //get post in background because it is very slow and make UI not response:(
+        var worker = new Worker(chrome.runtime.getURL('getPost.js'));
+        worker.onmessage = function(event) {
+            var args = event.data.args;
+            getPostImg(args[0], args[1]);
         };
-        
-    });
-});
+        worker.postMessage({
+            "args": [postUrls[i].href, i]
+        });
+    }
+}
 
+function getMatchListCallback(response) {
+    console.log("response DB length: " + response.postRegexs.length);
+    var postRegexs = response.postRegexs;
+    for (var i = 0; i < postRegexs.length; i++) {
+        var patt = new RegExp(postRegexs[i].matchUrl);
+        console.log("postRegexs[" + i + "].matchUrl : " + postRegexs[i].matchUrl);
+        console.log("postRegexs[" + i + "].matchUrl test: " + patt.test(thisTabUrl));
+        if (patt.test(thisTabUrl)) {
+            getAllMatchPost(postRegexs[i]);
+        }
+    };
+}
 
+function getThisTabUrlCallback(response) {
+    console.log("response tab.url: " + response.url);
+    thisTabUrl = response.url;
 
+    //no really need to wait this callback, maybe move out of this func someday
+    chrome.runtime.sendMessage({
+        method: "getMatchList"
+    }, getMatchListCallback);
+}
+
+//start here
+chrome.runtime.sendMessage({
+    method: "getThisTabUrl"
+}, getThisTabUrlCallback);
