@@ -8,7 +8,7 @@
 window.onload = function() {
 
   // Display the todo items.
-  todoDB.open(refreshTodos);
+  todoDB.open(refreshUI);
 
 
   // Get references to the form elements.
@@ -17,6 +17,7 @@ window.onload = function() {
   var imageSpaces = document.getElementById('imageSpaces');
   var postUrls = document.getElementById('postUrls');
   var skipUrls = document.getElementById('skipUrls');
+  var postImgUrl = document.getElementById('postImgUrl');
 
 
   // Handle new todo item form submissions.
@@ -26,15 +27,16 @@ window.onload = function() {
     var imageSpaces_text = imageSpaces.value;
     var postUrls_text = postUrls.value;
     var skipUrls_text = skipUrls.value;
+    var postImgUrl_text = postImgUrl.value;
 
 
     // Create the todo item.
-    todoDB.createTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, function(todo) {
-      refreshTodos();
+    todoDB.createTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, function(todo) {
+      refreshUI();
     });
 
     // Reset the input field.
-    newTodoInput.value = '';
+    newTodoForm.reset();
 
     // Don't send the form.
     return false;
@@ -43,10 +45,19 @@ window.onload = function() {
 }
 
 // Update the list of todo items.
-function refreshTodos() {
+function refreshUI() {
   todoDB.fetchTodos(function(todos) {
     var todoList = document.getElementById('todo-items');
-    todoList.innerHTML = '<tr><th>Edit</th><th>Delete</th><th>matchUrl</th><th>imageSpaces</th><th>postUrls</th><th>skipUrls(Optional)</th></tr>';
+    todoList.innerHTML = 
+    "<tr>"+
+      "<th>Edit</th>"+
+      "<th>Delete</th>"+
+      "<th>matchUrl</th>"+
+      "<th>imageSpaces</th>"+
+      "<th>postUrls</th>"+
+      "<th>skipUrls(Optional)</th>"+
+      "<th>postImgUrl</th>"+
+    "</tr>";
     console.log("fetchTodos todos.length: " + todos.length);
     for (var i = 0; i < todos.length; i++) {
       // Read the todo items backwards (most recent first).
@@ -59,6 +70,7 @@ function refreshTodos() {
       var td3 = document.createElement('td');
       var td4 = document.createElement('td');
       var td5 = document.createElement('td');
+      var td6 = document.createElement('td');
 
       var editBtn = document.createElement('input');
       editBtn.type = "button";
@@ -89,6 +101,8 @@ function refreshTodos() {
       td4.setAttribute('contenteditable', 'true');
       td5.innerHTML = todo.skipUrls;
       td5.setAttribute('contenteditable', 'true');
+      td6.innerHTML = todo.postImgUrl;
+      td6.setAttribute('contenteditable', 'true');
 
       tr.appendChild(td0);
       tr.appendChild(td1);
@@ -96,6 +110,7 @@ function refreshTodos() {
       tr.appendChild(td3);
       tr.appendChild(td4);
       tr.appendChild(td5);
+      tr.appendChild(td6);
       todoList.appendChild(tr);
 
       editBtn.addEventListener('click', function(e) {
@@ -104,6 +119,7 @@ function refreshTodos() {
         var imageSpaces_text;
         var postUrls_text;
         var skipUrls_text;
+        var postImgUrl_text;
         var table = document.getElementById('todo-items');
         for (var i = 1; i < table.rows.length; i++) {
           if (table.rows[i].cells[0].childNodes[0].getAttribute('data-id') == id) {
@@ -112,15 +128,19 @@ function refreshTodos() {
             imageSpaces_text = row.cells[3].innerHTML;
             postUrls_text = row.cells[4].innerHTML;
             skipUrls_text = row.cells[5].innerHTML;
+            postImgUrl_text = row.cells[6].innerHTML;
           }
         }
-        todoDB.updateTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, id, refreshTodos);
+        todoDB.updateTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, refreshUI);
       });
 
       delBtn.addEventListener('click', function(e) {
-        var id = parseInt(e.target.getAttribute('data-id'));
+        var checkDelete = confirm("Are you really want to delete this?");
+        if (checkDelete) {
+          var id = parseInt(e.target.getAttribute('data-id'));
+          todoDB.deleteTodo(id, refreshUI);
+        };
 
-        todoDB.deleteTodo(id, refreshTodos);
       });
     }
 

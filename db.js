@@ -90,7 +90,7 @@ var todoDB = (function() {
    * Create a new todo item.
    * @param {string} text The todo item.
    */
-  tDB.createTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, callback) {
+  tDB.createTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, callback) {
     // Get a reference to the db.
     var db = datastore;
 
@@ -109,6 +109,7 @@ var todoDB = (function() {
       'imageSpaces': imageSpaces_text,
       'postUrls': postUrls_text,
       'skipUrls': skipUrls_text,
+      'postImgUrl': postImgUrl_text,
       'timestamp': timestamp
     };
 
@@ -148,7 +149,7 @@ var todoDB = (function() {
     }
   };
 
-  tDB.updateTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, id, callback) {
+  tDB.updateTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
     var db = datastore;
     var transaction = db.transaction(['todo'], 'readwrite');
     var objStore = transaction.objectStore('todo');
@@ -162,6 +163,7 @@ var todoDB = (function() {
       data.imageSpaces = imageSpaces_text;
       data.postUrls = postUrls_text;
       data.skipUrls = skipUrls_text;
+      data.postImgUrl = postImgUrl_text;
       var requestUpdate = objStore.put(data);
       requestUpdate.onerror = function(event) {
         // Do something with the error
