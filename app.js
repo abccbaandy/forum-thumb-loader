@@ -1,42 +1,35 @@
-/**
- * @file The main logic for the Todo List App.
- * @author Matt West <matt.west@kojilabs.com>
- * @license MIT {@link http://opensource.org/licenses/MIT}.
- */
-
-
 window.onload = function() {
 
-  // Display the todo items.
-  todoDB.open(refreshUI);
+  // Display the matchPattern items.
+  matchPatternDB.open(refreshUI);
 
 
   // Get references to the form elements.
-  var newTodoForm = document.getElementById('new-todo-form');
-  var matchUrl = document.getElementById('matchUrl');
+  var newMatchPatternForm = document.getElementById('new-matchPattern-form');
+  var tabUrl = document.getElementById('tabUrl');
   var imageSpaces = document.getElementById('imageSpaces');
   var postUrls = document.getElementById('postUrls');
   var skipUrls = document.getElementById('skipUrls');
   var postImgUrl = document.getElementById('postImgUrl');
 
 
-  // Handle new todo item form submissions.
-  newTodoForm.onsubmit = function() {
-    // Get the todo text.
-    var matchUrl_text = matchUrl.value;
+  // Handle new matchPattern item form submissions.
+  newMatchPatternForm.onsubmit = function() {
+    // Get the matchPattern text.
+    var tabUrl_text = tabUrl.value;
     var imageSpaces_text = imageSpaces.value;
     var postUrls_text = postUrls.value;
     var skipUrls_text = skipUrls.value;
     var postImgUrl_text = postImgUrl.value;
 
 
-    // Create the todo item.
-    todoDB.createTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, function(todo) {
+    // Create the matchPattern item.
+    matchPatternDB.create(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, function(matchPattern) {
       refreshUI();
     });
 
     // Reset the input field.
-    newTodoForm.reset();
+    newMatchPatternForm.reset();
 
     // Don't send the form.
     return false;
@@ -44,24 +37,24 @@ window.onload = function() {
 
 }
 
-// Update the list of todo items.
+// Update the list of matchPattern items.
 function refreshUI() {
-  todoDB.fetchTodos(function(todos) {
-    var todoList = document.getElementById('todo-items');
-    todoList.innerHTML = 
-    "<tr>"+
-      "<th>Edit</th>"+
-      "<th>Delete</th>"+
-      "<th>matchUrl</th>"+
-      "<th>imageSpaces</th>"+
-      "<th>postUrls</th>"+
-      "<th>skipUrls(Optional)</th>"+
-      "<th>postImgUrl</th>"+
-    "</tr>";
-    console.log("fetchTodos todos.length: " + todos.length);
-    for (var i = 0; i < todos.length; i++) {
-      // Read the todo items backwards (most recent first).
-      var todo = todos[(todos.length - 1 - i)];
+  matchPatternDB.readAll(function(matchPatterns) {
+    var matchPatternList = document.getElementById('matchPattern-items');
+    matchPatternList.innerHTML =
+      "<tr>" +
+      "<th>Edit</th>" +
+      "<th>Delete</th>" +
+      "<th>tabUrl</th>" +
+      "<th>imageSpaces</th>" +
+      "<th>postUrls</th>" +
+      "<th>skipUrls(Optional)</th>" +
+      "<th>postImgUrl</th>" +
+      "</tr>";
+    console.log("read matchPatterns.length: " + matchPatterns.length);
+    for (var i = 0; i < matchPatterns.length; i++) {
+      // Read the matchPattern items backwards (most recent first).
+      var matchPattern = matchPatterns[(matchPatterns.length - 1 - i)];
 
       var tr = document.createElement('tr');
       var td0 = document.createElement('td');
@@ -76,32 +69,32 @@ function refreshUI() {
       editBtn.type = "button";
       editBtn.className = "editBtn";
       editBtn.value = "edit";
-      editBtn.setAttribute("data-id", todo.timestamp);
+      editBtn.setAttribute("data-id", matchPattern.timestamp);
 
       td0.appendChild(editBtn);
 
       var delBtn = document.createElement('input');
       delBtn.type = "button";
-      delBtn.className = "todo-checkbox";
+      delBtn.className = "matchPattern-checkbox";
       delBtn.value = "delete";
-      delBtn.setAttribute("data-id", todo.timestamp);
+      delBtn.setAttribute("data-id", matchPattern.timestamp);
 
       td1.appendChild(delBtn);
 
       //var span = document.createElement('span');
-      //span.innerHTML = todo.text;
+      //span.innerHTML = matchPattern.text;
 
       //td2.appendChild(span);
 
-      td2.innerHTML = todo.matchUrl;
+      td2.innerHTML = matchPattern.tabUrl;
       td2.setAttribute('contenteditable', 'true');
-      td3.innerHTML = todo.imageSpaces;
+      td3.innerHTML = matchPattern.imageSpaces;
       td3.setAttribute('contenteditable', 'true');
-      td4.innerHTML = todo.postUrls;
+      td4.innerHTML = matchPattern.postUrls;
       td4.setAttribute('contenteditable', 'true');
-      td5.innerHTML = todo.skipUrls;
+      td5.innerHTML = matchPattern.skipUrls;
       td5.setAttribute('contenteditable', 'true');
-      td6.innerHTML = todo.postImgUrl;
+      td6.innerHTML = matchPattern.postImgUrl;
       td6.setAttribute('contenteditable', 'true');
 
       tr.appendChild(td0);
@@ -111,34 +104,34 @@ function refreshUI() {
       tr.appendChild(td4);
       tr.appendChild(td5);
       tr.appendChild(td6);
-      todoList.appendChild(tr);
+      matchPatternList.appendChild(tr);
 
       editBtn.addEventListener('click', function(e) {
         var id = parseInt(e.target.getAttribute('data-id'));
-        var matchUrl_text;
+        var tabUrl_text;
         var imageSpaces_text;
         var postUrls_text;
         var skipUrls_text;
         var postImgUrl_text;
-        var table = document.getElementById('todo-items');
+        var table = document.getElementById('matchPattern-items');
         for (var i = 1; i < table.rows.length; i++) {
           if (table.rows[i].cells[0].childNodes[0].getAttribute('data-id') == id) {
             var row = table.rows[i];
-            matchUrl_text = row.cells[2].innerHTML;
+            tabUrl_text = row.cells[2].innerHTML;
             imageSpaces_text = row.cells[3].innerHTML;
             postUrls_text = row.cells[4].innerHTML;
             skipUrls_text = row.cells[5].innerHTML;
             postImgUrl_text = row.cells[6].innerHTML;
           }
         }
-        todoDB.updateTodo(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, refreshUI);
+        matchPatternDB.update(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, refreshUI);
       });
 
       delBtn.addEventListener('click', function(e) {
         var checkDelete = confirm("Are you really want to delete this?");
         if (checkDelete) {
           var id = parseInt(e.target.getAttribute('data-id'));
-          todoDB.deleteTodo(id, refreshUI);
+          matchPatternDB.delete(id, refreshUI);
         };
 
       });

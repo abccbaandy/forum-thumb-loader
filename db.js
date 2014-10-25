@@ -3,34 +3,35 @@
  * @author Matt West <matt.west@kojilabs.com>
  * @license MIT {@link http://opensource.org/licenses/MIT}.
  */
-
-var todoDB = (function() {
-  var tDB = {};
+//this is a module, check
+//http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html
+var matchPatternDB = (function() {
+  var dbObj = {};
   var datastore = null;
 
   /**
    * Open a connection to the datastore.
    */
-  tDB.open = function(callback) {
+  dbObj.open = function(callback) {
     // Database version.
     var version = 1;
 
     // Open a connection to the datastore.
-    var request = indexedDB.open('todos', version);
+    var request = indexedDB.open('matchPatterns', version);
 
     // Handle datastore upgrades.
     request.onupgradeneeded = function(e) {
       var db = e.target.result;
 
-      e.target.transaction.onerror = tDB.onerror;
+      e.target.transaction.onerror = dbObj.onerror;
 
       // Delete the old datastore.
-      if (db.objectStoreNames.contains('todo')) {
-        db.deleteObjectStore('todo');
+      if (db.objectStoreNames.contains('matchPattern')) {
+        db.deleteObjectStore('matchPattern');
       }
 
       // Create a new datastore.
-      var store = db.createObjectStore('todo', {
+      var store = db.createObjectStore('matchPattern', {
         keyPath: 'timestamp'
       });
     };
@@ -45,29 +46,29 @@ var todoDB = (function() {
     };
 
     // Handle errors when opening the datastore.
-    request.onerror = tDB.onerror;
+    request.onerror = dbObj.onerror;
   };
 
 
   /**
-   * Fetch all of the todo items in the datastore.
+   * Fetch all of the matchPattern items in the datastore.
    * @param {function} callback A function that will be executed once the items
    *                            have been retrieved. Will be passed a param with
-   *                            an array of the todo items.
+   *                            an array of the matchPattern items.
    */
-  tDB.fetchTodos = function(callback) {
+  dbObj.readAll = function(callback) {
     var db = datastore;
-    var transaction = db.transaction(['todo'], 'readwrite');
-    var objStore = transaction.objectStore('todo');
+    var transaction = db.transaction(['matchPattern'], 'readwrite');
+    var objStore = transaction.objectStore('matchPattern');
 
     var keyRange = IDBKeyRange.lowerBound(0);
     var cursorRequest = objStore.openCursor(keyRange);
 
-    var todos = [];
+    var matchPatterns = [];
 
     transaction.oncomplete = function(e) {
       // Execute the callback function.
-      callback(todos);
+      callback(matchPatterns);
     };
 
     cursorRequest.onsuccess = function(e) {
@@ -77,35 +78,35 @@ var todoDB = (function() {
         return;
       }
 
-      todos.push(result.value);
+      matchPatterns.push(result.value);
 
       result.continue();
     };
 
-    cursorRequest.onerror = tDB.onerror;
+    cursorRequest.onerror = dbObj.onerror;
   };
 
 
   /**
-   * Create a new todo item.
-   * @param {string} text The todo item.
+   * Create a new matchPattern item.
+   * @param {string} text The matchPattern item.
    */
-  tDB.createTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, callback) {
+  dbObj.create= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, callback) {
     // Get a reference to the db.
     var db = datastore;
 
     // Initiate a new transaction.
-    var transaction = db.transaction(['todo'], 'readwrite');
+    var transaction = db.transaction(['matchPattern'], 'readwrite');
 
     // Get the datastore.
-    var objStore = transaction.objectStore('todo');
+    var objStore = transaction.objectStore('matchPattern');
 
-    // Create a timestamp for the todo item.
+    // Create a timestamp for the matchPattern item.
     var timestamp = new Date().getTime();
 
-    // Create an object for the todo item.
-    var todo = {
-      'matchUrl': matchUrl_text,
+    // Create an object for the matchPattern item.
+    var matchPattern = {
+      'tabUrl': tabUrl_text,
       'imageSpaces': imageSpaces_text,
       'postUrls': postUrls_text,
       'skipUrls': skipUrls_text,
@@ -114,29 +115,29 @@ var todoDB = (function() {
     };
 
     // Create the datastore request.
-    var request = objStore.put(todo);
+    var request = objStore.put(matchPattern);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {
       // Execute the callback function.
-      callback(todo);
+      callback(matchPattern);
     };
 
     // Handle errors.
-    request.onerror = tDB.onerror;
+    request.onerror = dbObj.onerror;
   };
 
 
   /**
-   * Delete a todo item.
-   * @param {int} id The timestamp (id) of the todo item to be deleted.
+   * Delete a matchPattern item.
+   * @param {int} id The timestamp (id) of the matchPattern item to be deleted.
    * @param {function} callback A callback function that will be executed if the
    *                            delete is successful.
    */
-  tDB.deleteTodo = function(id, callback) {
+  dbObj.delete= function(id, callback) {
     var db = datastore;
-    var transaction = db.transaction(['todo'], 'readwrite');
-    var objStore = transaction.objectStore('todo');
+    var transaction = db.transaction(['matchPattern'], 'readwrite');
+    var objStore = transaction.objectStore('matchPattern');
 
     var request = objStore.delete(id);
 
@@ -149,17 +150,17 @@ var todoDB = (function() {
     }
   };
 
-  tDB.updateTodo = function(matchUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
+  dbObj.update= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
     var db = datastore;
-    var transaction = db.transaction(['todo'], 'readwrite');
-    var objStore = transaction.objectStore('todo');
+    var transaction = db.transaction(['matchPattern'], 'readwrite');
+    var objStore = transaction.objectStore('matchPattern');
 
     var request = objStore.get(id);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {
       var data = request.result;
-      data.matchUrl = matchUrl_text;
+      data.tabUrl = tabUrl_text;
       data.imageSpaces = imageSpaces_text;
       data.postUrls = postUrls_text;
       data.skipUrls = skipUrls_text;
@@ -179,8 +180,8 @@ var todoDB = (function() {
     };
 
     // Handle errors.
-    request.onerror = tDB.onerror;
+    request.onerror = dbObj.onerror;
   };
-  // Export the tDB object.
-  return tDB;
+  // Export the dbObj object.
+  return dbObj;
 }());

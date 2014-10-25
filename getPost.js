@@ -1,10 +1,9 @@
-function getPost(url, showImgIndex) {
+function getPost(url, postIndex) {
     xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            //getImg(xmlhttp.responseText, showImgIndex);
             postMessage({
-                "args": [xmlhttp.responseText, showImgIndex]
+                "args": [xmlhttp.responseText, postIndex]
             })
         }
     }

@@ -1,18 +1,18 @@
 var sendResponseLocal;
 
 function dbOpenCallback() {
-    todoDB.fetchTodos(function(todos) {
-        console.log("fetchTodos todos.length: " + todos.length);
+    matchPatternDB.readAll(function(matchPatterns) {
+        console.log("read matchPatterns.length: " + matchPatterns.length);
         sendResponseLocal({
-            postRegexs: todos
+            matchPatterns: matchPatterns
         });
     });
 }
 
 function getThisTabUrlCallback(tab) {
-    console.log("tab.url : " + tab.url);
+    //console.log("tab.url : " + tab.url);
     sendResponseLocal({
-        url: tab.url
+        thisTabUrl: tab.url
     });
 }
 
@@ -20,8 +20,8 @@ function getThisTabUrlCallback(tab) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     sendResponseLocal = sendResponse;
 
-    if (request.method == "getMatchList") {
-        todoDB.open(dbOpenCallback);
+    if (request.method == "getMatchPatterns") {
+        matchPatternDB.open(dbOpenCallback);
         return true;
     } else if (request.method == "getThisTabUrl") {
         chrome.tabs.get(sender.tab.id, getThisTabUrlCallback);

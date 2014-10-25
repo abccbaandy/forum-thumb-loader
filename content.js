@@ -3,7 +3,7 @@
 // var imageSpaces = document.querySelectorAll(".tr3.t_one td a[title='打开新窗口']");
 // var postUrls = document.querySelectorAll(".tr3.t_one td h3 a");
 // var skipUrls = document.querySelectorAll(".tr3.t_one td img[title='置顶帖标志']");
-// postImgUrl = #read_tpc.f14 img
+// postImgUrlPattern = #read_tpc.f14 img
 
 
 //search
@@ -11,100 +11,100 @@
 // var imageSpaces = document.querySelectorAll("tr.tr3.tac th.y-style");
 // var postUrls = document.querySelectorAll("tr.tr3.tac th.y-style a");
 // var skipUrls = document.querySelectorAll("");
-// postImgUrl = #read_tpc.f14 img
+// postImgUrlPattern = #read_tpc.f14 img
 
 var imageSpaces;
 var postUrls;
 var skipUrls;
 var thisTabUrl;
-var postImgUrl;
+var postImgUrlPattern;
 
-function showThumbnail(img, imageSpacesIndex) {
+function showPostThumbnail(img, postIndex) {
     var tempImg = document.createElement('img');
     tempImg.src = img.src;
     tempImg.width = 200;
     tempImg.height = 200;
-    imageSpaces[imageSpacesIndex].appendChild(tempImg);
+    imageSpaces[postIndex].appendChild(tempImg);
 }
 
-function loadPostImg(imgsUrls, loadImgCount, imageSpacesIndex) {
+function loadPostImg(imgsUrls, loadImgCount, postIndex) {
     var img = new Image();
     img.src = imgsUrls[loadImgCount].src;
     img.onload = function() {
 
         //we only care the first valid image:)
         if (img.naturalWidth > 100 && img.naturalHeight > 100) {
-            showThumbnail(img, imageSpacesIndex);
+            showPostThumbnail(img, postIndex);
         } else {
             loadImgCount++;
             if (loadImgCount < imgsUrls.length) {
-                loadPostImg(imgsUrls, loadImgCount, imageSpacesIndex);
+                loadPostImg(imgsUrls, loadImgCount, postIndex);
             }
         }
     }
 }
 
-function getPostImg(responseText, imageSpacesIndex) {
+function getPostImg(responseText, postIndex) {
     var result = new DOMParser().parseFromString(responseText, "text/html");
-
-    var imgsUrls = result.querySelectorAll("#read_tpc.f14 img");
+    var imgsUrls = result.querySelectorAll(postImgUrlPattern);
     // console.log("getPostImg imgsUrls length : " + imgsUrls.length);
 
-    //check there is at least one image
     if (imgsUrls.length != 0) {
-        //load "first image" first
-        loadPostImg(imgsUrls, 0, imageSpacesIndex);
+        loadPostImg(imgsUrls, 0, postIndex);
     }
 }
 
-function getAllMatchPost(postRegex) {
-    imageSpaces = document.querySelectorAll(postRegex.imageSpaces);
-    console.log("getAllMatchPost imageSpaces length : " + imageSpaces.length);
-    postUrls = document.querySelectorAll(postRegex.postUrls);
-    console.log("getAllMatchPost postUrls length : " + postUrls.length);
-    if (postRegex.skipUrls == "") {
+function workerCallback(event) {
+    var args = event.data.args;
+    getPostImg(args[0], args[1]);
+}
+
+function getAllMatchPosts(matchPattern) {
+    postImgUrlPattern = matchPattern.postImgUrl;
+    imageSpaces = document.querySelectorAll(matchPattern.imageSpaces);
+    // console.log("getAllMatchPosts imageSpaces length : " + imageSpaces.length);
+    postUrls = document.querySelectorAll(matchPattern.postUrls);
+    // console.log("getAllMatchPosts postUrls length : " + postUrls.length);
+
+    if (matchPattern.skipUrls == "") {
+        //no need to skip anything
         skipUrls = [];
     } else {
-        skipUrls = document.querySelectorAll(postRegex.skipUrls);
+        skipUrls = document.querySelectorAll(matchPattern.skipUrls);
     }
-    console.log("getAllMatchPost skipUrls length : " + skipUrls.length);
-    
-    
-    for (var i = skipUrls.length; i < postUrls.length; i++) {
+    // console.log("getAllMatchPosts skipUrls length : " + skipUrls.length);
 
+    for (var i = skipUrls.length; i < postUrls.length; i++) {
         //get post in background because it is very slow and make UI not response:(
         var worker = new Worker(chrome.runtime.getURL('getPost.js'));
-        worker.onmessage = function(event) {
-            var args = event.data.args;
-            getPostImg(args[0], args[1]);
-        };
+        worker.onmessage = workerCallback;
         worker.postMessage({
             "args": [postUrls[i].href, i]
         });
     }
 }
 
-function getMatchListCallback(response) {
-    console.log("response DB length: " + response.postRegexs.length);
-    var postRegexs = response.postRegexs;
-    for (var i = 0; i < postRegexs.length; i++) {
-        var patt = new RegExp(postRegexs[i].matchUrl);
-        console.log("postRegexs[" + i + "].matchUrl : " + postRegexs[i].matchUrl);
-        console.log("postRegexs[" + i + "].matchUrl test: " + patt.test(thisTabUrl));
-        if (patt.test(thisTabUrl)) {
-            getAllMatchPost(postRegexs[i]);
+function getMatchPatternsCallback(response) {
+    // console.log("getMatchPatternsCallback matchPatterns length: " + response.matchPatterns.length);
+    var matchPatterns = response.matchPatterns;
+    for (var i = 0; i < matchPatterns.length; i++) {
+        var pattern = new RegExp(matchPatterns[i].tabUrl);
+        // console.log("matchPatterns[" + i + "].tabUrl : " + matchPatterns[i].tabUrl);
+        // console.log("matchPatterns[" + i + "].tabUrl test: " + pattern.test(thisTabUrl));
+        if (pattern.test(thisTabUrl)) {
+            getAllMatchPosts(matchPatterns[i]);
         }
-    };
+    }
 }
 
 function getThisTabUrlCallback(response) {
-    console.log("response tab.url: " + response.url);
-    thisTabUrl = response.url;
+    // console.log("getThisTabUrlCallback thisTabUrl: " + response.thisTabUrl);
+    thisTabUrl = response.thisTabUrl;
 
     //no really need to wait this callback, maybe move out of this func someday
     chrome.runtime.sendMessage({
-        method: "getMatchList"
-    }, getMatchListCallback);
+        method: "getMatchPatterns"
+    }, getMatchPatternsCallback);
 }
 
 //start here
