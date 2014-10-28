@@ -1,0 +1,54 @@
+<link rel="import" href="/components/polymer/polymer.html">
+
+<polymer-element name="matchpattern-table">
+<!-- outermost template defines the element's shadow DOM -->
+<template>
+  <link rel="stylesheet" href="style.css">
+  <form id="new-matchPattern-form" on-submit="{{formSubmit}}">
+      <input type="text" name="tabUrl" id="tabUrl" placeholder="tabUrl" required>
+      <input type="text" name="imageSpaces" id="imageSpaces" placeholder="imageSpaces" required>
+      <input type="text" name="postUrls" id="postUrls" placeholder="postUrls" required>
+      <input type="text" name="skipUrls" id="skipUrls" placeholder="skipUrls(Optional)" >
+      <input type="text" name="postImgUrl" id="postImgUrl" placeholder="postImgUrl" required>
+      <input type="submit" value="Save">
+    </form>
+  <table>
+    <tr>
+      <th>Edit</th>
+      <th>Delete</th>
+      <th>tabUrl</th>
+      <th>imageSpaces</th>
+      <th>postUrls</th>
+      <th>skipUrls(Optional)</th>
+      <th>postImgUrl</th>
+    </tr>
+    <template repeat="{{m, mIndex in matchPatterns}}">
+      <tr>
+        <td>
+          <button data-index={{mIndex}} data-id={{m.timestamp}} on-click="{{editMatchPattern}}">edit</button>
+        </td>
+        <td>
+          <button data-index={{mIndex}} data-id={{m.timestamp}} on-click="{{deleteMatchPattern}}">delete</button>
+        </td>
+        <td contenteditable="true">
+          <input type="text" value="{{m.tabUrl}}">
+        </td>
+        <td contenteditable="true">
+          <input type="text" value="{{m.imageSpaces}}">
+        </td>
+        <td contenteditable="true">
+          <input type="text" value="{{m.postUrls}}">
+        </td>
+        <td contenteditable="true">
+          <input type="text" value="{{m.skipUrls}}">
+        </td>
+        <td contenteditable="true">
+          <input type="text" value="{{m.postImgUrl}}">
+        </td>
+      </tr>
+    </template>
+  </table>
+</template>
+<script src="db.js"></script>
+<script src="matchpattern-table.js"></script>
+</polymer-element>

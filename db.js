@@ -150,22 +150,25 @@ var matchPatternDB = (function() {
     }
   };
 
-  dbObj.update= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
+  //dbObj.update= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
+    dbObj.update= function(matchPattern, callback) {
     var db = datastore;
     var transaction = db.transaction(['matchPattern'], 'readwrite');
     var objStore = transaction.objectStore('matchPattern');
 
-    var request = objStore.get(id);
+    // var request = objStore.get(id);
+    var request = objStore.get(matchPattern.timestamp);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {
-      var data = request.result;
-      data.tabUrl = tabUrl_text;
-      data.imageSpaces = imageSpaces_text;
-      data.postUrls = postUrls_text;
-      data.skipUrls = skipUrls_text;
-      data.postImgUrl = postImgUrl_text;
-      var requestUpdate = objStore.put(data);
+      // var data = request.result;
+      // data.tabUrl = tabUrl_text;
+      // data.imageSpaces = imageSpaces_text;
+      // data.postUrls = postUrls_text;
+      // data.skipUrls = skipUrls_text;
+      // data.postImgUrl = postImgUrl_text;
+      // var requestUpdate = objStore.put(data);
+      var requestUpdate = objStore.put(matchPattern);
       requestUpdate.onerror = function(event) {
         // Do something with the error
       };
