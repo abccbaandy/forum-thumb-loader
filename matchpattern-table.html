@@ -5,13 +5,13 @@
 <template>
   <link rel="stylesheet" href="style.css">
   <form id="new-matchPattern-form" on-submit="{{formSubmit}}">
-      <input type="text" name="tabUrl" id="tabUrl" placeholder="tabUrl" required>
-      <input type="text" name="imageSpaces" id="imageSpaces" placeholder="imageSpaces" required>
-      <input type="text" name="postUrls" id="postUrls" placeholder="postUrls" required>
-      <input type="text" name="skipUrls" id="skipUrls" placeholder="skipUrls(Optional)" >
-      <input type="text" name="postImgUrl" id="postImgUrl" placeholder="postImgUrl" required>
-      <input type="submit" value="Save">
-    </form>
+    <input type="text" name="tabUrl" placeholder="tabUrl" value="{{newMatchPattern.tabUrl}}" required>
+    <input type="text" name="imageSpaces" placeholder="imageSpaces" value="{{newMatchPattern.imageSpaces}}" required>
+    <input type="text" name="postUrls" placeholder="postUrls" value="{{newMatchPattern.postUrls}}" required>
+    <input type="text" name="skipUrls" placeholder="skipUrls(Optional)" value="{{newMatchPattern.skipUrls}}">
+    <input type="text" name="postImgUrl" placeholder="postImgUrl" value="{{newMatchPattern.postImgUrl}}" required>
+    <input type="submit" value="Save">
+  </form>
   <table>
     <tr>
       <th>Edit</th>

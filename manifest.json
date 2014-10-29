@@ -7,10 +7,10 @@
 		"persistent": false,
 		"scripts": ["worker_proxy.js", "db.js", "eventPage.js"]
 	},
-	"options_page": "index.html",
+	"options_page": "manage.html",
 	"content_scripts": [{
 		"matches": ["<all_urls>"],
-		"js": ["worker_proxy.js", "db.js", "content.js"]
+		"js": ["worker_proxy.js", "content.js"]
 	}],
 	"web_accessible_resources": ["worker_proxy.html"],
 	"permissions": ["unlimitedStorage", "storage", "tabs"],

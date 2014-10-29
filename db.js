@@ -12,7 +12,7 @@ var matchPatternDB = (function() {
   /**
    * Open a connection to the datastore.
    */
-  dbObj.open = function(callback) {
+   dbObj.open = function(callback) {
     // Database version.
     var version = 1;
 
@@ -56,7 +56,7 @@ var matchPatternDB = (function() {
    *                            have been retrieved. Will be passed a param with
    *                            an array of the matchPattern items.
    */
-  dbObj.readAll = function(callback) {
+   dbObj.readAll = function(callback) {
     var db = datastore;
     var transaction = db.transaction(['matchPattern'], 'readwrite');
     var objStore = transaction.objectStore('matchPattern');
@@ -91,7 +91,7 @@ var matchPatternDB = (function() {
    * Create a new matchPattern item.
    * @param {string} text The matchPattern item.
    */
-  dbObj.create= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, callback) {
+   dbObj.create= function(newMatchPattern, callback) {
     // Get a reference to the db.
     var db = datastore;
 
@@ -103,24 +103,15 @@ var matchPatternDB = (function() {
 
     // Create a timestamp for the matchPattern item.
     var timestamp = new Date().getTime();
-
-    // Create an object for the matchPattern item.
-    var matchPattern = {
-      'tabUrl': tabUrl_text,
-      'imageSpaces': imageSpaces_text,
-      'postUrls': postUrls_text,
-      'skipUrls': skipUrls_text,
-      'postImgUrl': postImgUrl_text,
-      'timestamp': timestamp
-    };
+    newMatchPattern.timestamp = timestamp;
 
     // Create the datastore request.
-    var request = objStore.put(matchPattern);
+    var request = objStore.put(newMatchPattern);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {
       // Execute the callback function.
-      callback(matchPattern);
+      callback();
     };
 
     // Handle errors.
@@ -134,7 +125,7 @@ var matchPatternDB = (function() {
    * @param {function} callback A callback function that will be executed if the
    *                            delete is successful.
    */
-  dbObj.delete= function(id, callback) {
+   dbObj.delete= function(id, callback) {
     var db = datastore;
     var transaction = db.transaction(['matchPattern'], 'readwrite');
     var objStore = transaction.objectStore('matchPattern');
@@ -150,24 +141,15 @@ var matchPatternDB = (function() {
     }
   };
 
-  //dbObj.update= function(tabUrl_text, imageSpaces_text, postUrls_text, skipUrls_text, postImgUrl_text, id, callback) {
-    dbObj.update= function(matchPattern, callback) {
+  dbObj.update= function(matchPattern, callback) {
     var db = datastore;
     var transaction = db.transaction(['matchPattern'], 'readwrite');
     var objStore = transaction.objectStore('matchPattern');
 
-    // var request = objStore.get(id);
     var request = objStore.get(matchPattern.timestamp);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {
-      // var data = request.result;
-      // data.tabUrl = tabUrl_text;
-      // data.imageSpaces = imageSpaces_text;
-      // data.postUrls = postUrls_text;
-      // data.skipUrls = skipUrls_text;
-      // data.postImgUrl = postImgUrl_text;
-      // var requestUpdate = objStore.put(data);
       var requestUpdate = objStore.put(matchPattern);
       requestUpdate.onerror = function(event) {
         // Do something with the error

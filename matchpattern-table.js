@@ -14,6 +14,7 @@ function readMatchPatternDB() {
 Polymer('matchpattern-table', {
   ready: function() {
     openMatchPatternDB();
+    this.newMatchPattern = {};
   },
   updateUI: function() {
     this.matchPatterns = tempMatchPatterns;
@@ -27,6 +28,6 @@ Polymer('matchpattern-table', {
     }
   },
   formSubmit: function(event, detail, sender) {
-    matchPatternDB.create("1", "1", "1", "1", "1", readMatchPatternDB);
+    matchPatternDB.create(this.newMatchPattern, readMatchPatternDB);
   }
 });
