@@ -1,11 +1,11 @@
 <link rel="import" href="/components/polymer/polymer.html">
-
 <polymer-element name="matchpattern-table">
 <!-- outermost template defines the element's shadow DOM -->
 <template>
   <link rel="stylesheet" href="style.css">
-  <button on-click="{{exportMatchPatterns}}">export</button>
-  <button on-click="{{importMatchPatterns}}">import</button>
+  
+  <paper-button raised class="colored" on-click="{{exportMatchPatterns}}">export</paper-button>
+  <paper-button raised class="colored" on-click="{{importMatchPatterns}}">import</paper-button>
   <form id="new-matchPattern-form" on-submit="{{formSubmit}}">
     <input type="text" name="tabUrl" placeholder="tabUrl" value="{{newMatchPattern.tabUrl}}" required>
     <input type="text" name="imageSpaces" placeholder="imageSpaces" value="{{newMatchPattern.imageSpaces}}" required>

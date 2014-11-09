@@ -1,7 +1,27 @@
 table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
+	border: 1px solid black;
+	border-collapse: collapse;
 }
 th, td {
-    padding: 5px;
+	padding: 5px;
+}
+paper-button.colored {
+	color: #4285f4;
+}
+
+paper-button[raised].colored {
+	background: #4285f4;
+	color: #fff;
+}
+
+paper-button.custom > core-icon {
+	margin-right: 4px;
+}
+
+paper-button.hover:hover {
+	background: #eee;
+}
+
+paper-button.blue-ripple::shadow #ripple {
+	color: #4285f4;
 }
