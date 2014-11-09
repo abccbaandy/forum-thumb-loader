@@ -17,7 +17,7 @@ var matchPatternDB = (function() {
     var version = 1;
 
     // Open a connection to the datastore.
-    var request = indexedDB.open('matchPatterns', version);
+    var request = indexedDB.open('matchPattern', version);
 
     // Handle datastore upgrades.
     request.onupgradeneeded = function(e) {
@@ -32,7 +32,8 @@ var matchPatternDB = (function() {
 
       // Create a new datastore.
       var store = db.createObjectStore('matchPattern', {
-        keyPath: 'timestamp'
+        keyPath: "id", 
+        autoIncrement:true
       });
     };
 
@@ -101,9 +102,10 @@ var matchPatternDB = (function() {
     // Get the datastore.
     var objStore = transaction.objectStore('matchPattern');
 
-    // Create a timestamp for the matchPattern item.
-    var timestamp = new Date().getTime();
-    newMatchPattern.timestamp = timestamp;
+    //delete newMatchPattern id if exist
+    if (newMatchPattern.id!=undefined) {
+      delete newMatchPattern.id;
+    };
 
     // Create the datastore request.
     var request = objStore.put(newMatchPattern);
@@ -119,12 +121,6 @@ var matchPatternDB = (function() {
   };
 
 
-  /**
-   * Delete a matchPattern item.
-   * @param {int} id The timestamp (id) of the matchPattern item to be deleted.
-   * @param {function} callback A callback function that will be executed if the
-   *                            delete is successful.
-   */
    dbObj.delete= function(id, callback) {
     var db = datastore;
     var transaction = db.transaction(['matchPattern'], 'readwrite');
@@ -146,7 +142,7 @@ var matchPatternDB = (function() {
     var transaction = db.transaction(['matchPattern'], 'readwrite');
     var objStore = transaction.objectStore('matchPattern');
 
-    var request = objStore.get(matchPattern.timestamp);
+    var request = objStore.get(matchPattern.id);
 
     // Handle a successful datastore put.
     request.onsuccess = function(e) {

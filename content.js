@@ -13,6 +13,9 @@
 // var skipUrls = document.querySelectorAll("");
 // postImgUrlPattern = #read_tpc.f14 img
 
+//json export
+//[{"tabUrl":"http:\\/\\/bbs\\.soul-plus\\.net\\/thread\\.php\\?.*","imageSpaces":".tr3.t_one td a[title='打开新窗口']","postUrls":".tr3.t_one td h3 a","skipUrls":".tr3.t_one td img[title='置顶帖标志']","postImgUrl":"#read_tpc.f14 img"},{"tabUrl":"http:\\/\\/bbs\\.soul-plus\\.net\\/search\\.php\\?.*","imageSpaces":"tr.tr3.tac th.y-style","postUrls":"tr.tr3.tac th.y-style a","skipUrls":"","postImgUrl":"#read_tpc.f14 img"}]
+
 var imageSpaces;
 var postUrls;
 var skipUrls;

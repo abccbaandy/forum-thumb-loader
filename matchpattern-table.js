@@ -11,6 +11,15 @@ function readMatchPatternDB() {
   });
 }
 
+function exportMatchPatternDBToJson (matchPatterns) {
+  //remove id, we don't need id
+  for (index in matchPatterns) {
+    delete matchPatterns[index].id;
+  }
+  prompt("Copy it and save to safe place:)", JSON.stringify(matchPatterns));
+
+}
+
 Polymer('matchpattern-table', {
   ready: function() {
     openMatchPatternDB();
@@ -29,5 +38,14 @@ Polymer('matchpattern-table', {
   },
   formSubmit: function(event, detail, sender) {
     matchPatternDB.create(this.newMatchPattern, readMatchPatternDB);
+  },
+  exportMatchPatterns: function(event, detail, sender) {
+    matchPatternDB.readAll(exportMatchPatternDBToJson);
+  },
+  importMatchPatterns: function(event, detail, sender) {
+    var matchPatterns = JSON.parse(prompt("Enter the data"));
+    for (index in matchPatterns) {
+      matchPatternDB.create(matchPatterns[index], readMatchPatternDB);
+    }
   }
 });

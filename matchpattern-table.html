@@ -4,6 +4,8 @@
 <!-- outermost template defines the element's shadow DOM -->
 <template>
   <link rel="stylesheet" href="style.css">
+  <button on-click="{{exportMatchPatterns}}">export</button>
+  <button on-click="{{importMatchPatterns}}">import</button>
   <form id="new-matchPattern-form" on-submit="{{formSubmit}}">
     <input type="text" name="tabUrl" placeholder="tabUrl" value="{{newMatchPattern.tabUrl}}" required>
     <input type="text" name="imageSpaces" placeholder="imageSpaces" value="{{newMatchPattern.imageSpaces}}" required>
@@ -25,24 +27,24 @@
     <template repeat="{{m, mIndex in matchPatterns}}">
       <tr>
         <td>
-          <button data-index={{mIndex}} data-id={{m.timestamp}} on-click="{{editMatchPattern}}">edit</button>
+          <button data-index={{mIndex}} data-id={{m.id}} on-click="{{editMatchPattern}}">edit</button>
         </td>
         <td>
-          <button data-index={{mIndex}} data-id={{m.timestamp}} on-click="{{deleteMatchPattern}}">delete</button>
+          <button data-index={{mIndex}} data-id={{m.id}} on-click="{{deleteMatchPattern}}">delete</button>
         </td>
-        <td contenteditable="true">
+        <td >
           <input type="text" value="{{m.tabUrl}}">
         </td>
-        <td contenteditable="true">
+        <td >
           <input type="text" value="{{m.imageSpaces}}">
         </td>
-        <td contenteditable="true">
+        <td >
           <input type="text" value="{{m.postUrls}}">
         </td>
-        <td contenteditable="true">
+        <td >
           <input type="text" value="{{m.skipUrls}}">
         </td>
-        <td contenteditable="true">
+        <td >
           <input type="text" value="{{m.postImgUrl}}">
         </td>
       </tr>
